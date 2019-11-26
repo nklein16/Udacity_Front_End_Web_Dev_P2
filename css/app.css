@@ -153,3 +153,42 @@ h1 {
     color: white;
     max-width: 80%;
 }
+
+/* Media query for Google Nexus 5X phone size */
+@media only screen and (max-width: 450px) {
+
+    .deck {
+        width: 320px;
+        min-height: 340px;
+        padding: 5px;
+        box-shadow: 1px 2px 2px 0 rgba(46, 61, 73, 0.5);
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        margin: 0 0 1em;
+    }
+
+    .deck .card {
+        height: 65px;
+        width: 65px;
+        padding: 1em 1em 1em 1em;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .score-panel {
+        width: 300px;
+    }
+
+    .score-panel #timer{
+        padding-right: 3em;
+    }
+
+    .modal {
+        height: 360px;
+        font-size: 25px;
+    }
+}

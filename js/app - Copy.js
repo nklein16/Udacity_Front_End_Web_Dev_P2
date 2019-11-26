@@ -64,7 +64,7 @@ window.addEventListener('DOMContentLoaded', function() {
 // Shuffle cards and add them (back) to the deck
 // Works Correctly
 function addToDeck() {
-    cardList = shuffle(cardList);
+    // cardList = shuffle(cardList);
     for(const card of cardList) {
         // Flips cards face-down
         card.classList.remove('open','show','match');
@@ -142,6 +142,10 @@ function flipCards() {
                             if(document.getElementsByClassName('match').length === 16) {
 
                                 // Handling duration/timer
+                                
+                                // Stops the clock without clearing the time
+                                clearInterval(interval);
+
                                 // let sec = document.getElementById('seconds');
                                 // let secTens = document.getElementById('secondTens');
                                 // let min = document.getElementById('minute');
@@ -151,8 +155,7 @@ function flipCards() {
                                 
                                 // console.log(duration);
 
-                                // Stops the clock without clearing the time
-                                clearInterval(interval);
+                                
                                 showGameOverMessage(duration, numStarsRemaining);
                             }
                         }
@@ -188,13 +191,14 @@ function flipCards() {
                             // let last_star_style = getComputedStyle(stars.children()[0])
                             // if(last_star_style.color === 'rgb(0, 0, 0)' || min.innerText >= 2) {
                             // if(flag === 0 || (min.innerText === 1 && secondSpan.innerText === 30) ) {
-                            if(flag === 0 || (sec.innerText === 3) ) {
+                            if(flag === 0 || (sec.innerHTML === 30) ) {
+                                
+                                // Stops the clock without clearing the time
+                                clearInterval(interval);
+
                                 duration = min.innerHTML + ':' + sec.innerHTML;
                                 // duration = $("#minute").innerHTML + $("seconds").innerHTML; 
                                 // console.log(duration);
-
-                                // Stops the clock without clearing the time
-                                clearInterval(interval);
 
                                 // Sets last flag to black
                                 stars.children().eq(flag-1).css('color', 'black');
@@ -502,9 +506,9 @@ function buildModal(duration, numStarsRemaining) {
     let message = document.createElement('p');
     message.setAttribute("id", "modal-message");
 
-    // Get minutes and seconds - this is ticky because it is constantly changing!!!
-    sec = document.getElementById('seconds');
-    min = document.getElementById('minute');
+    // Get minutes and seconds - this is tricky because it is constantly changing!!!
+    // sec = document.getElementById('seconds');
+    // min = document.getElementById('minute');
 
     if(document.getElementsByClassName('match').length === 16) {
 
@@ -512,13 +516,14 @@ function buildModal(duration, numStarsRemaining) {
         message.innerHTML = `Congratulations!! <br><br> You completed the game in ${moveCounter} moves and in only ${duration} time!<br><br>
         You also finished the game with ${numStarsRemaining} ${starText} remaining!`;
     }
+
     else {
         // TODO: Fix this logic; game is not picking up on the time
         // You are setting the value; what you need to do is GET the value from the DOM!!!
         // Should you use innerText or innerHTML? Or something else?
 
-        // if((min.innerText === 1 && sec.innerText === 30)) {
-        if(min.innerText === 1) {
+        // if((min.innerHTML === 1 && sec.innerHTML === 30)) {
+        if(sec.innerHTML === 30) {
             message.innerHTML = `You lose!<br><br> At ${duration} you took too long!`;
 
         }
@@ -527,7 +532,13 @@ function buildModal(duration, numStarsRemaining) {
         }
     }
 
-    message.style.cssText = 'margin: 20% auto; padding: 5%; text-align: center; font-size: 40px';
+    // Change size of text message depending on size of screen
+    if(window.screen.width < 500) {
+        message.style.cssText = 'margin: 20% auto; padding: 5%; text-align: center; font-size: 20px';
+    }
+    else {
+        message.style.cssText = 'margin: 20% auto; padding: 5%; text-align: center; font-size: 40px';
+    }
 
     modal.appendChild(modalBtn);
     modal_body.appendChild(message);
