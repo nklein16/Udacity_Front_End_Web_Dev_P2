@@ -62,10 +62,9 @@ window.addEventListener('DOMContentLoaded', function() {
 */
 
 // Shuffle cards and add them (back) to the deck
-// Uncomment out the line to shuffle before finalizing; commented out for purpose of faster testing
 // Works Correctly
 function addToDeck() {
-    // cardList = shuffle(cardList);
+    cardList = shuffle(cardList);
     for(const card of cardList) {
         // Flips cards face-down
         card.classList.remove('open','show','match');
@@ -310,7 +309,7 @@ function resetStars() {
 }
 
 // Creates the timer
-// TODO: Fix and clean up; works correctly, but added another digit for tens' second place if possible 
+// TODO: Fix and clean up; works correctly, but add another digit for tens' second place if possible 
 function createTimer() {
 
     let timer = document.getElementById('timer');
@@ -517,7 +516,7 @@ function buildModal(duration, numStarsRemaining) {
         // TODO: Fix this logic; game is not picking up on the time
         // You are setting the value; what you need to do is GET the value from the DOM!!!
         // Should you use innerText or innerHTML? Or something else?
-        
+
         // if((min.innerText === 1 && sec.innerText === 30)) {
         if(min.innerText === 1) {
             message.innerHTML = `You lose!<br><br> At ${duration} you took too long!`;
