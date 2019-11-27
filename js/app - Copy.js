@@ -2,18 +2,13 @@
  * Course: Udacity's Front-End Web Development Course 
  * Project: Memory Game (Project #2)
  * File Name: app - Copy.js (to be revised)
- * Date Completed: 09/29/19
+ * Date Completed: 11/26/19
  */
 
 // Global variables
 
 let deckElement = document.getElementsByClassName('deck')[0];
-// let cardList = deckElement.children;
 let cardList = Array.from(deckElement.children);
-
-// shuffle cards
-// let shuffled = shuffle(cardList)
-//cardList = shuffle(cardList);
 
 // Set openCardsList
 let openCardsList = [];
@@ -29,30 +24,19 @@ let interval;
 let duration;
 
 // Handle counter
-// let sec = 0
-// sec = sec.toString().padStart(2, '0');
 let sec = document.getElementById('seconds');
-// let sec = document.getElementById('seconds').innerHTML = `${sec}`;
-// let secTens = document.getElementById('secondTens');
 let min = document.getElementById('minute');
 
-
 // Handle fails
-var fails = 0
+var fails = 0;
 
 // Used to monitor stars and hide them per algorithm 
 var stars = $('.stars');
 var flag = stars.children().length;
-var numStarsRemaining = 3;
-var numStarsTurnedOff = 0;
+var numStarsRemaining = 4;
 
 // modal for end of game
 let modal = document.querySelector('.modal');
-
-/* When the page loads or reloads, this is the first thing that will happen */
-window.addEventListener('DOMContentLoaded', function() {
-    addToDeck();
-});
 
 /*
 * Display the cards on the page
@@ -62,12 +46,13 @@ window.addEventListener('DOMContentLoaded', function() {
 */
 
 // Shuffle cards and add them (back) to the deck
-// Works Correctly
 function addToDeck() {
-    // cardList = shuffle(cardList);
+    cardList = shuffle(cardList);
+    // iterate through list of cards
     for(const card of cardList) {
-        // Flips cards face-down
+        // Flip card face-down
         card.classList.remove('open','show','match');
+        // add card to deck
         deckElement.appendChild(card);
     }    
 }
@@ -100,110 +85,87 @@ function shuffle(array) {
  *    + if all cards have matched, display a message with the final score (put this functionality in another function that you call from this one)
  */
 
- // Base Functionality Works Correctly, BUT...
-//  TODOs:  Fix as notes indicate...Also, implement losing logic by time and flags
 function flipCards() {
 
     cardList.forEach( function(card) {
         card.addEventListener('click', function() {
 
-            // What is the point of this if statement?  There's nothing of value in it...
-            if(card.classList.contains('open') || card.classList.contains('match')){
-                // console.log('already open');
-            }
-
-            else {
+            // If card is not open and not a match
+            if( !(card.classList.contains('open') || card.classList.contains('match'))){
 
                 if(openCardsList.length < 2){
                     showCard(card);
                     addCardToOpenCardsList(card);
                     
-                    // If second card was just added, check for match
+                    // If second card was just added, add to move counter, display new move count, and check for match
                     if(openCardsList.length === 2){
                         
                         trackMoveCounter();
                         moves.innerText = moveCounter;
-                        // console.log('Moves: ' + moveCounter);
 
                         if( isMatch() ) {    
-                            // console.log("It's a match!");
                             for(card of openCardsList) {
-                                // flip card over
-                                // add match class to card
+                                // add match class to card to lock in place
                                 card.classList.add('match');
-                                // remove 'open' and 'show' classes from card
-                                hideCard(card);
+                                // flip card over by removing 'open' and 'show' classes from card
+                                // hideCard(card);
 
                             }
 
+                            // clears the list of open cards
                             openCardsList = [];
 
                             // check if all cards have been matched
                             if(document.getElementsByClassName('match').length === 16) {
-
-                                // Handling duration/timer
                                 
                                 // Stops the clock without clearing the time
                                 clearInterval(interval);
 
-                                // let sec = document.getElementById('seconds');
-                                // let secTens = document.getElementById('secondTens');
-                                // let min = document.getElementById('minute');
-                                // let duration = min.innerHTML + ':' + secTens.innerHTML + sec.innerHTML;
-                                duration = min.innerHTML + ':' + sec.innerHTML;
-                                // duration = $("#minute").innerHTML + $("seconds").innerHTML; 
-                                
-                                // console.log(duration);
+                                // calculates duration
+                                // duration = min.innerHTML + ':' + sec.innerHTML;
+                                duration = getDuration();
 
-                                
-                                showGameOverMessage(duration, numStarsRemaining);
+                                // called from here when player has won the game
+                                showGameOverMessage(duration);
                             }
                         }
-                        // If openCardsList != 2
-                        else {
 
-                            // console.log('The cards do not match');
+                        // If two opened cards are not a match
+                        else {
                             
                             // Flip the non-matching cards back over again and clear the openCardsList
                             setTimeout( function() {
                                 openCardsList.forEach( function(card) {
                                     hideCard(card);
-                                })
+                                });
                                 openCardsList = [];
                                 
                             }, 1000);
 
-                            // This section tracks the logic of when to remove a star
+                            // This section tracks the logic of when to remove a star - on every fourth non-match a star is removed
                             fails++;
-                            // console.log('Number of fails: ' + fails);
                             if(fails%4 === 0) {
                                 if(flag > 0) {
-                                    // console.log('Flags: ' + flag);
-                                    // console.log('remove a star');
                                     removeStar();
                                     flag--;
                                 }
                             }
 
-                            // TODO: Fix timing part of logic
-
-                            // No more stars or too much time taken, so you lose
-                            // let last_star_style = getComputedStyle(stars.children()[0])
-                            // if(last_star_style.color === 'rgb(0, 0, 0)' || min.innerText >= 2) {
-                            // if(flag === 0 || (min.innerText === 1 && secondSpan.innerText === 30) ) {
-                            if(flag === 0 || (sec.innerHTML === 30) ) {
+                            // if there are no more stars remaining
+                            if(flag === 0) {
                                 
                                 // Stops the clock without clearing the time
                                 clearInterval(interval);
-
-                                duration = min.innerHTML + ':' + sec.innerHTML;
-                                // duration = $("#minute").innerHTML + $("seconds").innerHTML; 
-                                // console.log(duration);
-
-                                // Sets last flag to black
-                                stars.children().eq(flag-1).css('color', 'black');
                                 
-                                showGameOverMessage(duration, numStarsRemaining);
+                                // calculates duration
+                                // duration = min.innerHTML + ':' + sec.innerHTML;
+                                duration = getDuration();
+                                
+                                // Sets last star to black
+                                // stars.children().eq(flag-1).css('color', 'black');
+                                
+                                // called from here when player has lost the game
+                                showGameOverMessage(duration);
                             }
                         }
                     }
@@ -213,7 +175,6 @@ function flipCards() {
     });    
 }
 
-// Works Correctly
 // Adds the 'open' and 'show' attributes to a card
 // Fundamentally, this flips the card face-up
 function showCard(card) {
@@ -221,22 +182,18 @@ function showCard(card) {
     card.classList.add('show');
 }
 
-// Works Correctly
 // Removes the 'open' and 'show' attributes from a card
 // Fundamentally, this flips the card face-down
 function hideCard(card) {
-    // console.log("hiding card");
     card.classList.remove('open');
     card.classList.remove('show');
 }
 
-// Works Correctly
 // Adds card to openCardList[] Array
 function addCardToOpenCardsList(card) {
     openCardsList.push(card);
 }
 
-// Works Correctly
 // Checks if the two cards in openCardsList[] Array match by symbol
 function isMatch() {
 
@@ -248,7 +205,6 @@ function isMatch() {
     return false;
 }
 
-// Works Correctly
 // Increments the number of moves and sets it on the board;
 // starts the timer when the second card of the game is flipped over
 function trackMoveCounter() {
@@ -259,243 +215,119 @@ function trackMoveCounter() {
     }
 }
 
+// Get duration
+function getDuration() {
+    return min.innerHTML + ':' + sec.innerHTML;
+}
+
 // This is an Immediately-Invoked Function Expression (IIFE) that creates the game timer
 // and turns the cards face-down to begin the game.
-// Works Correctly
 (function(){
+    addToDeck();
     createTimer();
     flipCards();
 })();
 
-// Works Correctly
 // global listen event on the reset button; when clicked, the entire game is reset
 var reset = document.querySelector('.fa-repeat');
 reset.addEventListener('click', function() {
     resetBoard();
 });
 
-// Works Correctly
 // Resets the board for the game; called when page first loads and at the end of a game
 function resetBoard() {
 
-    openCardsList = []
+    openCardsList = [];
     addToDeck();
     resetMoves();
     resetTimer();
     resetStars();
-    // console.clear();
 }
 
-// Works Correctly
 // Resets the number of moves to zero and displays on the webpage
 function resetMoves() {
     moveCounter = 0;
     document.querySelector('.moves').innerHTML = moveCounter;
 }
 
-// Works Correctly
 // Resets the game timer
 function resetTimer() {
     clearInterval(interval);
     document.querySelector('#seconds').innerHTML = 0;
-    // document.querySelector('#secondTens').innerHTML = 0;
     document.querySelector('#minute').innerHTML = 0;
 }
 
-// Works Correctly
+
 // Resets the stars to gold to start the game
 function resetStars() {
     stars.children().css('color','gold');
     fails = 0;
-    numStarsTurnedOff = 0;
-    flag = 3;
-    numStarsRemaining = 3;
+    flag = 4;
+    numStarsRemaining = 4;
 }
 
 // Creates the timer
-// TODO: Fix and clean up; works correctly, but add another digit for tens' second place if possible 
 function createTimer() {
 
+    // Get the timer element
     let timer = document.getElementById('timer');
 
+    // Create the span to hold the minute counter
     let minuteSpan = document.createElement('span');
     minuteSpan.setAttribute('id','minute');
     minuteSpan.innerText = 0;
     timer.appendChild(minuteSpan);
 
+    // Create the span for the colon
     let colonSpan = document.createElement('span');
     colonSpan.innerText = ' : ';
     timer.appendChild(colonSpan);
 
-    // let secondTensSpan = document.createElement('span');
-    // secondTensSpan.setAttribute("id", "secondTens");
-    // secondTensSpan.innerText = 0;
-    // timer.appendChild(secondTensSpan);
-
+    // Create the span to hold the second counter
     let secondSpan = document.createElement('span');
     secondSpan.setAttribute("id", "seconds");
-    // let sspan = secondSpan.innerText.toString().padStart(2, '0');
-    // secondSpan.innerHTML = `{sspan}`;
     secondSpan.innerText = 0;
     timer.appendChild(secondSpan);
 
-    // let sec = 0
-    // sec = sec.toString().padStart(2, '0');
-    // sec = document.getElementById('seconds').innerHTML = `${sec}`;
-
-
 }
 
-// TODO: REMOVE
-// function timer2() {
-//     var sec = 0;
-//     function pad ( val ) { return val > 9 ? val : "0" + val; }
-//     setInterval( function(){
-//         $("#seconds").html(pad(++sec%60));
-//         $("#minute").html(pad(parseInt(sec/60,10)));
-//     }, 1000)
-// }
-
 // Starts the timer
-// TODO: Fix and clean up - want to add Pause button if possible 
 function startTimer() {
     
     sec = document.getElementById('seconds');
-    // secTens = document.getElementById('secondTens');
     min = document.getElementById('minute');
-    
-    let pauseButton = $('#pause');
-    // pauseButton.innerText = 'Pause';
-    let isPaused = false;
 
     interval = setInterval( function() {
-
-        if(!isPaused) {
-            // pauseButton.innerHTML = 'Pause';
-            // sec.innerHTML = pad2(sec.innerHTML);
-            sec.innerHTML++;
-            if(sec.innerHTML%60 === 0) {
-                sec.innerHTML = 0;
-                min.innerHTML++;
-                // secTens.innerHTML++;
-            }
-            // if(secTens.innerHTML%60 === 0){
-            // if(sec.innerHTML%60 === 0){
-                // sec.innerHTML = 0;
-                // secTens.innerHTML = 0;
-                // min.innerHTML++;s
-            // }
-            // if(secTens === 6) {
-            //     sec.innerHTML = 0;
-            //     secTens.innerHTML = 0;
-            //     min.innerHTML++;
-            // }
-            // if(sec.innerHTML%6 === 0 && secTens.innerHTML === 0) {
-            //     secTens.innerHTML = 0;
-            //     min.innerHTML++;
-            // }
-
-            // pauseButton.on('click', function(e) {
-            //     console.log('trying to pause the game...');
-            //     e.preventDefault();
-            //     isPaused = true;
-            //     pauseButton.val('Continue');
-            //     // pauseButton.innerText = 'Continue';
-            // });
-
-            // $('#pause').on('click', function(e) {
-            //     console.log('trying to pause game...')
-            //     e.preventDefault();
-            //     isPaused = true;
-            //     $('#pause').val('Continue');
-            //     pauseButton.innerHTML = 'Continue';
-            // });
-
-            // $('#continue').on('click', function(e) {
-            //     // console.log('trying to pause game...')
-            //     e.preventDefault();
-            //     isPaused = false;
-            //     // $('#pause').val('Pause');
-            //     // pauseButton.html('Continue');
-            //     pauseButton.innerHTML = 'Pause';
-            // });
-
+        sec.innerHTML++;
+        if(sec.innerHTML%60 === 0) {
+            sec.innerHTML = 0;
+            min.innerHTML++;
         }
-
     }, 1000);
-
-    pauseButton.on('click', function(e) {
-        console.log('trying to pause the game...');
-        e.preventDefault();
-        isPaused = true;
-        pauseButton.val('Continue');
-        // pauseButton.innerText = 'Continue';
-    });
-
-    // $('#pause').on('click', function(e) {
-    //     e.preventDefault();
-    //     isPaused = true;
-    //     $('#pause').val('Continue');
-    //     pauseButton.innerText = 'Continue';
-    // });
-
-    // $('#continue').on('click', function(e) {
-    //     e.preventDefault();
-    //     isPaused = false;
-    //     // pauseButton.html('Pause');
-    // });
-}
-// TODO: REMOVE
-function pauseClock() {
-    if(!isPaused) {
-        isPaused = true;
-        clearInterval(interval);
-    }
-}
-// TODO: REMOVE
-function resumeClock() {
-    if(isPaused){
-        isPaused = false;
-    }
-    // how to start clock again here?
-    startTimer();
 }
 
-// TODO: REMOVE
-// function pad2(seconds) {
-//     if(seconds.toString().length == 1){
-//         seconds = "0" + seconds;
-//     }
-    
-    // return seconds < 10 ? seconds.before("0") : "" + seconds;
-// }
-
-// Working correctly
-// Removes a star by turning it from gold to black every four misses
+// Removes a star by turning it from gold to black every on every fourth non-match
 function removeStar() {
     stars.children().eq(flag-1).css('color', 'black');
-    numStarsTurnedOff++;
     numStarsRemaining--;
-    // console.log('Number of stars turned off ' + numStarsTurnedOff);
-    // console.log('Number of stars remaining: ' + numStarsRemaining);
-
 }
 
 // Calls methods to build and display the message at the end of the game
-function showGameOverMessage(duration, numStarsRemaining) {
-    buildModal(duration, numStarsRemaining);
+function showGameOverMessage(duration) {
+    buildModal(duration);
     displayModal();
 }
 
 // Creates the modal for display
-function buildModal(duration, numStarsRemaining) {
+function buildModal(duration) {
 
-    let modal = document.getElementById('gameOverModal');
+    // let modal = document.getElementById('gameOverModal');
 
     // button
     modalBtn = document.createElement('button');
     modalBtn.setAttribute('class', 'closeBtn');
 
+    // Puts the X on the button to close the modal
     modalBtn.innerHTML = '&times;';
     modalBtn.style.cssText = 'float: right; font-size: 15px; background-color: coral; color: lightblue; margin: 5px 5px 0 0; cursor: pointer';
 
@@ -506,30 +338,17 @@ function buildModal(duration, numStarsRemaining) {
     let message = document.createElement('p');
     message.setAttribute("id", "modal-message");
 
-    // Get minutes and seconds - this is tricky because it is constantly changing!!!
-    // sec = document.getElementById('seconds');
-    // min = document.getElementById('minute');
-
+    // Message upon winning
     if(document.getElementsByClassName('match').length === 16) {
 
-        numStarsRemaining != 1 ? starText = 'stars' : starText = 'star';        
+        starText = numStarsRemaining != 1 ? 'stars' : 'star';        
         message.innerHTML = `Congratulations!! <br><br> You completed the game in ${moveCounter} moves and in only ${duration} time!<br><br>
         You also finished the game with ${numStarsRemaining} ${starText} remaining!`;
     }
 
+    // Message upon losing
     else {
-        // TODO: Fix this logic; game is not picking up on the time
-        // You are setting the value; what you need to do is GET the value from the DOM!!!
-        // Should you use innerText or innerHTML? Or something else?
-
-        // if((min.innerHTML === 1 && sec.innerHTML === 30)) {
-        if(sec.innerHTML === 30) {
-            message.innerHTML = `You lose!<br><br> At ${duration} you took too long!`;
-
-        }
-        else if(numStarsTurnedOff === 3) {
-            message.innerHTML = `You lose!<br><br> You had a few too many missed opportunities, so you have no stars remaining`;
-        }
+        message.innerHTML = `You lose!<br><br> You had a few too many missed opportunities, so you have no stars remaining`;
     }
 
     // Change size of text message depending on size of screen
@@ -549,10 +368,15 @@ function buildModal(duration, numStarsRemaining) {
 // Displays the end of game message modal and resets the board after three seconds
 function displayModal() {
 
+    // Display the modal
     modal.style.display = 'block';
 
     modalBtn.addEventListener('click', function() {
+        
+        // Tears down all parts of the modal built with javascript as part of the cleanup event
         modal.querySelectorAll('*').forEach(n => n.remove());
+        
+        // Hides the modal itself
         modal.style.display = 'none';
     });
 

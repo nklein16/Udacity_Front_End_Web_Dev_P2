@@ -102,13 +102,14 @@ h1 {
 .score-panel #timer{
     display: inline-block;
     font-size: 23px;
-    padding-right: 4em;
+    padding-right: 6em;
 }
 
 .score-panel .stars {
     padding: 0;
     display: inline-block;
     margin: 0 5px 0 0;
+
     /* My addition; otherwise black */
     color: gold;
     flex-grow: 1;
@@ -120,8 +121,6 @@ h1 {
 }
 
 .score-panel .restart {
-    /* float: right; */
-    /* display: flex; */
     flex-grow: 1;
     align-items: flex-end;
     cursor: pointer;
@@ -130,12 +129,6 @@ h1 {
 .score-panel .restart .fa-repeat {
     float: right;
 }
-
-/* #pause {
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-    font-size: 1em;
-    display: inline-block;
-} */
 
 /* Modal */
 .modal {
@@ -154,7 +147,7 @@ h1 {
     max-width: 80%;
 }
 
-/* Media query for Google Nexus 5X phone size */
+/* Media query to handle mobile phone sizes */
 @media only screen and (max-width: 450px) {
 
     .deck {
